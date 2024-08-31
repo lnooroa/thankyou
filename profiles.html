@@ -63,14 +63,14 @@
         <h1>Profiles</h1>
         <p>Learn about the different types of people who may be interested in collaborative housing.</p>
     </header>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="profiles.html">Profiles</a>
-        <a href="project-ideas.html">Project Ideas</a>
-        <a href="submit-project.html">Submit a Project</a>
-        <a href="resources.html">Resources</a>
-    </nav>
-
+    <div id="menu-placeholder"></div>
+    <script>
+        fetch('menu.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('menu-placeholder').innerHTML = data;
+            });
+    </script>
     <div class="container">
         <section class="profile-type">
             <h2>Young Professionals</h2>
