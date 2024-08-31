@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThankYou - Submit a Project</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        header {
+            background-color: #6a9fb5;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        nav {
+            background-color: #4a6a74;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 1.2em;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            padding: 20px;
+        }
+        .submit-form {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .submit-form h2 {
+            margin-top: 0;
+            color: #6a9fb5;
+        }
+        .submit-form p {
+            font-size: 1.1em;
+        }
+        .submit-form input,
+        .submit-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .submit-form button {
+            background-color: #6a9fb5;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .submit-form button:hover {
+            background-color: #4a6a74;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Submit a Project</h1>
+        <p>Have a great idea for a collaborative housing project? Share it with the community!</p>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="profiles.html">Profiles</a>
+        <a href="project-ideas.html">Project Ideas</a>
+        <a href="submit-project.html">Submit a Project</a>
+        <a href="resources.html">Resources</a>
+    </nav>
+
+    <div class="container">
+        <section class="submit-form">
+            <h2>Submit Your Project Idea</h2>
+            <p>Please fill out the form below to submit your project idea. Be sure to include as much detail as possible to help others understand your vision.</p>
+            <form action="#" method="post">
+                <input type="text" name="project-title" placeholder="Project Title" required>
+                <textarea name="project-description" rows="6" placeholder="Project Description" required></textarea>
+                <input type="text" name="contact-info" placeholder="Your Contact Info" required>
+                <button type="submit">Submit Project</button>
+            </form>
+        </section>
+    </div>
+</body>
+</html>
