@@ -214,8 +214,8 @@ a:hover {
 }
 
 .small-image {
-    max-width: 30%;
-    height: auto;
+    height: 150px;
+    width: auto;
 }
 
 footer {
