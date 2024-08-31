@@ -39,6 +39,19 @@ nav a:hover {
     text-decoration: underline;
 }
 
+a {
+    color: #6a9fb5;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #6a9fb5;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 .container {
     padding: 20px;
 }
