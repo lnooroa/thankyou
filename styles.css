@@ -43,16 +43,6 @@ nav a:hover {
     padding: 20px;
 }
 
-footer {
-    background-color: #4a6a74;
-    color: white;
-    text-align: center;
-    padding: 10px;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-}
-
 .intro {
     background-color: #fff;
     border-radius: 8px;
@@ -80,4 +70,142 @@ footer {
 
 .section h3 {
     color: #4a6a74;
+}
+
+.profile-type {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.profile-type h2 {
+    margin-top: 0;
+    color: #6a9fb5;
+}
+
+.profile-type p {
+    font-size: 1.1em;
+}
+
+.menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+.menu-container:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.project-idea {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.project-idea h2 {
+    margin-top: 0;
+    color: #6a9fb5;
+}
+
+.project-idea p {
+    font-size: 1.1em;
+}
+
+.resource-link {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.resource-link h2 {
+    margin-top: 0;
+    color: #6a9fb5;
+}
+
+.resource-link p {
+    font-size: 1.1em;
+}
+
+.resource-link a {
+    color: #6a9fb5;
+    text-decoration: none;
+}
+
+.resource-link a:hover {
+    text-decoration: underline;
+}
+
+.submit-form {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.submit-form h2 {
+    margin-top: 0;
+    color: #6a9fb5;
+}
+
+.submit-form p {
+    font-size: 1.1em;
+}
+
+.submit-form input,
+.submit-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.submit-form button {
+    background-color: #6a9fb5;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.submit-form button:hover {
+    background-color: #4a6a74;
+}
+
+footer {
+    background-color: #4a6a74;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
 }
