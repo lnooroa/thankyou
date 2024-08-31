@@ -213,6 +213,11 @@ a:hover {
     background-color: #4a6a74;
 }
 
+.small-image {
+    max-width: 30%;
+    height: auto;
+}
+
 footer {
     background-color: #4a6a74;
     color: white;
