@@ -82,14 +82,14 @@
         <h1>Submit a Project</h1>
         <p>Have a great idea for a collaborative housing project? Share it with the community!</p>
     </header>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="profiles.html">Profiles</a>
-        <a href="project-ideas.html">Project Ideas</a>
-        <a href="submit-project.html">Submit a Project</a>
-        <a href="resources.html">Resources</a>
-    </nav>
-
+    <div id="menu-placeholder"></div>
+    <script>
+        fetch('menu.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('menu-placeholder').innerHTML = data;
+            });
+    </script>
     <div class="container">
         <section class="submit-form">
             <h2>Submit Your Project Idea</h2>
