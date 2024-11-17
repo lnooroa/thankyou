@@ -11,71 +11,37 @@
         .table-striped tr:nth-child(even) { background-color: #f9f9f9; }
         table { border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        .debug { margin-top: 20px; color: red; font-family: monospace; white-space: pre-wrap; }
     </style>
 </head>
 <body>
     <div id="menu" class="menu"></div>
     <div id="content"></div>
-    <div id="debug" class="debug"></div>
 
     <script>
         const SHEETS_API_URL = "https://sheets.googleapis.com/v4/spreadsheets";
         const SHEET_ID = "1nIvuosTOZolBb4eoyBb-dZOufKW1-9kgRwB4galSUlM"; // Replace with your Google Sheet ID
         const API_KEY = "AIzaSyDauOae1oqVgzKL5LLcX7E2H3DqwvSd5PM"; // Replace with your Google API Key
 
-        // Helper function to log debug messages
-        function debugLog(message) {
-            const debugDiv = document.getElementById("debug");
-            debugDiv.textContent += message + "\n";
-        }
-
         // Fetch all sheet names to dynamically generate the menu
         async function fetchSheetNames() {
-            try {
-                const url = `${SHEETS_API_URL}/${SHEET_ID}?key=${API_KEY}`;
-                debugLog(`Fetching sheet names from: ${url}`);
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
-                debugLog("Sheet names fetched successfully!");
-                return data.sheets.map(sheet => sheet.properties.title);
-            } catch (error) {
-                debugLog(`Error fetching sheet names: ${error.message}`);
-                return [];
-            }
+            const url = `${SHEETS_API_URL}/${SHEET_ID}?key=${API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.sheets.map(sheet => sheet.properties.title);
         }
 
         // Fetch specific sheet content
         async function fetchSheet(sheetName) {
-            try {
-                const url = `${SHEETS_API_URL}/${SHEET_ID}/values/${sheetName}?key=${API_KEY}`;
-                debugLog(`Fetching sheet: ${sheetName} from: ${url}`);
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
-                debugLog(`Sheet "${sheetName}" fetched successfully!`);
-                return data.values;
-            } catch (error) {
-                debugLog(`Error fetching sheet "${sheetName}": ${error.message}`);
-                return [];
-            }
+            const url = `${SHEETS_API_URL}/${SHEET_ID}/values/${sheetName}?key=${API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.values;
         }
 
         // Render the menu
         async function renderMenu() {
-            debugLog("Rendering menu...");
             const sheetNames = await fetchSheetNames();
             const menuDiv = document.getElementById("menu");
-
-            if (sheetNames.length === 0) {
-                debugLog("No sheets found or failed to fetch sheet names.");
-                return;
-            }
 
             sheetNames.filter(name => name.startsWith("w_")).forEach(name => {
                 const menuName = name.replace("w_", "").replace("_", " "); // Clean up name
@@ -85,21 +51,13 @@
                 link.onclick = () => loadPage(name);
                 menuDiv.appendChild(link);
             });
-
-            debugLog("Menu rendered successfully.");
         }
 
         // Load and render a web page
         async function loadPage(sheetName) {
-            debugLog(`Loading page: ${sheetName}`);
             const pageData = await fetchSheet(sheetName);
             const contentDiv = document.getElementById("content");
             contentDiv.innerHTML = ""; // Clear previous content
-
-            if (pageData.length === 0) {
-                debugLog(`No data found for page: ${sheetName}`);
-                return;
-            }
 
             pageData.forEach(row => {
                 row.forEach(cellContent => {
@@ -125,39 +83,42 @@
                     }
                 });
             });
-
-            debugLog(`Page "${sheetName}" loaded successfully.`);
         }
 
         // Render a table
         async function renderTable(tableName, filters, sort, container) {
-            debugLog(`Rendering table: ${tableName}`);
             const tableData = await fetchSheet(tableName);
 
-            if (tableData.length === 0) {
-                debugLog(`No data found for table: ${tableName}`);
-                return;
-            }
+            if (tableData.length === 0) return;
 
             const table = document.createElement("table");
             table.className = "table-striped";
-            const headers = tableData[0];
-            let rows = tableData.slice(1);
+            const headers = tableData[0]; // First row is the header
+            let rows = tableData.slice(1); // Remaining rows are the data
 
             // Apply filters
             if (filters) {
-                const [filterColumn, filterValue] = filters[1].split("=");
-                rows = rows.filter(row => row[headers.indexOf(filterColumn.trim())] === filterValue.trim());
+                const filterMatch = filters[0].split("="); // e.g., ["status", "Open"]
+                const filterColumn = filterMatch[0].trim();
+                const filterValue = filterMatch[1].trim();
+
+                const colIndex = headers.indexOf(filterColumn);
+                if (colIndex !== -1) {
+                    rows = rows.filter(row => row[colIndex] === filterValue);
+                }
             }
 
             // Apply sorting
             if (sort) {
-                const [sortColumn, sortDirection] = sort[1].split(" ");
+                const [sortColumn, sortDirection] = sort[0].split(" ");
                 const colIndex = headers.indexOf(sortColumn.trim());
-                rows.sort((a, b) => {
-                    if (sortDirection === "ASC") return a[colIndex] > b[colIndex] ? 1 : -1;
-                    else return a[colIndex] < b[colIndex] ? 1 : -1;
-                });
+
+                if (colIndex !== -1) {
+                    rows.sort((a, b) => {
+                        if (sortDirection === "ASC") return a[colIndex] > b[colIndex] ? 1 : -1;
+                        return a[colIndex] < b[colIndex] ? 1 : -1;
+                    });
+                }
             }
 
             // Create table header
@@ -185,11 +146,9 @@
             table.appendChild(tbody);
 
             container.appendChild(table);
-            debugLog(`Table "${tableName}" rendered successfully.`);
         }
 
         // Initialize
-        debugLog("Initializing...");
         renderMenu();
         loadPage("w_home"); // Default to home page
     </script>
