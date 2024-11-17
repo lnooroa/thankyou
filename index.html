@@ -66,12 +66,23 @@
                     if (cellContent.startsWith("{")) {
                         // Handle special keywords
                         if (cellContent.startsWith("{style:")) {
-                            const styleClass = cellContent.match(/\{style: (.*?)\}/)[1];
+                            const styleMatch = cellContent.match(/\{style: (.*?)\}/);
+                            const styleClassOrInline = styleMatch ? styleMatch[1] : "";
                             const styledDiv = document.createElement("div");
-                            styledDiv.className = styleClass;
+                        
+                            if (styleClassOrInline.startsWith("inline;")) {
+                                // Inline styles
+                                const inlineStyles = styleClassOrInline.replace("inline;", "").trim();
+                                styledDiv.setAttribute("style", inlineStyles);
+                            } else {
+                                // Class-based styles
+                                styledDiv.className = styleClassOrInline;
+                            }
+                        
                             styledDiv.innerText = cellContent.replace(/\{style:.*?\}/, "").trim(); // Remove {style:}
                             rowDiv.appendChild(styledDiv);
-                        } else if (cellContent.startsWith("{table:")) {
+                        }
+                        else if (cellContent.startsWith("{table:")) {
                             const tableParams = cellContent.match(/\{table: (.*?)(,.*?)*\}/)[1];
                             const filters = cellContent.match(/filter: (.*?),/);
                             const sort = cellContent.match(/sort: (.*?)\}/);
