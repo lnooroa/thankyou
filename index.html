@@ -11,37 +11,71 @@
         .table-striped tr:nth-child(even) { background-color: #f9f9f9; }
         table { border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        .debug { margin-top: 20px; color: red; font-family: monospace; white-space: pre-wrap; }
     </style>
 </head>
 <body>
     <div id="menu" class="menu"></div>
     <div id="content"></div>
+    <div id="debug" class="debug"></div>
 
     <script>
         const SHEETS_API_URL = "https://sheets.googleapis.com/v4/spreadsheets";
-        const SHEET_ID = "1nIvuosTOZolBb4eoyBb-dZOufKW1-9kgRwB4galSUlM";
-        const API_KEY = "AIzaSyDauOae1oqVgzKL5LLcX7E2H3DqwvSd5PM";
+        const SHEET_ID = "1nIvuosTOZolBb4eoyBb-dZOufKW1-9kgRwB4galSUlM"; // Replace with your Google Sheet ID
+        const API_KEY = "AIzaSyDauOae1oqVgzKL5LLcX7E2H3DqwvSd5PM"; // Replace with your Google API Key
+
+        // Helper function to log debug messages
+        function debugLog(message) {
+            const debugDiv = document.getElementById("debug");
+            debugDiv.textContent += message + "\n";
+        }
 
         // Fetch all sheet names to dynamically generate the menu
         async function fetchSheetNames() {
-            const url = `${SHEETS_API_URL}/${SHEET_ID}?key=${API_KEY}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data.sheets.map(sheet => sheet.properties.title);
+            try {
+                const url = `${SHEETS_API_URL}/${SHEET_ID}?key=${API_KEY}`;
+                debugLog(`Fetching sheet names from: ${url}`);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                debugLog("Sheet names fetched successfully!");
+                return data.sheets.map(sheet => sheet.properties.title);
+            } catch (error) {
+                debugLog(`Error fetching sheet names: ${error.message}`);
+                return [];
+            }
         }
 
         // Fetch specific sheet content
         async function fetchSheet(sheetName) {
-            const url = `${SHEETS_API_URL}/${SHEET_ID}/values/${sheetName}?key=${API_KEY}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data.values;
+            try {
+                const url = `${SHEETS_API_URL}/${SHEET_ID}/values/${sheetName}?key=${API_KEY}`;
+                debugLog(`Fetching sheet: ${sheetName} from: ${url}`);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                debugLog(`Sheet "${sheetName}" fetched successfully!`);
+                return data.values;
+            } catch (error) {
+                debugLog(`Error fetching sheet "${sheetName}": ${error.message}`);
+                return [];
+            }
         }
 
         // Render the menu
         async function renderMenu() {
+            debugLog("Rendering menu...");
             const sheetNames = await fetchSheetNames();
             const menuDiv = document.getElementById("menu");
+
+            if (sheetNames.length === 0) {
+                debugLog("No sheets found or failed to fetch sheet names.");
+                return;
+            }
 
             sheetNames.filter(name => name.startsWith("w_")).forEach(name => {
                 const menuName = name.replace("w_", "").replace("_", " "); // Clean up name
@@ -51,13 +85,21 @@
                 link.onclick = () => loadPage(name);
                 menuDiv.appendChild(link);
             });
+
+            debugLog("Menu rendered successfully.");
         }
 
         // Load and render a web page
         async function loadPage(sheetName) {
+            debugLog(`Loading page: ${sheetName}`);
             const pageData = await fetchSheet(sheetName);
             const contentDiv = document.getElementById("content");
             contentDiv.innerHTML = ""; // Clear previous content
+
+            if (pageData.length === 0) {
+                debugLog(`No data found for page: ${sheetName}`);
+                return;
+            }
 
             pageData.forEach(row => {
                 row.forEach(cellContent => {
@@ -83,11 +125,19 @@
                     }
                 });
             });
+
+            debugLog(`Page "${sheetName}" loaded successfully.`);
         }
 
         // Render a table
         async function renderTable(tableName, filters, sort, container) {
+            debugLog(`Rendering table: ${tableName}`);
             const tableData = await fetchSheet(tableName);
+
+            if (tableData.length === 0) {
+                debugLog(`No data found for table: ${tableName}`);
+                return;
+            }
 
             const table = document.createElement("table");
             table.className = "table-striped";
@@ -135,9 +185,11 @@
             table.appendChild(tbody);
 
             container.appendChild(table);
+            debugLog(`Table "${tableName}" rendered successfully.`);
         }
 
         // Initialize
+        debugLog("Initializing...");
         renderMenu();
         loadPage("w_home"); // Default to home page
     </script>
