@@ -60,6 +60,8 @@
             contentDiv.innerHTML = ""; // Clear previous content
 
             pageData.forEach(row => {
+                const rowDiv = document.createElement("div");
+
                 row.forEach(cellContent => {
                     if (cellContent.startsWith("{")) {
                         // Handle special keywords
@@ -68,20 +70,22 @@
                             const styledDiv = document.createElement("div");
                             styledDiv.className = styleClass;
                             styledDiv.innerText = cellContent.replace(/\{style:.*?\}/, "").trim(); // Remove {style:}
-                            contentDiv.appendChild(styledDiv);
+                            rowDiv.appendChild(styledDiv);
                         } else if (cellContent.startsWith("{table:")) {
                             const tableParams = cellContent.match(/\{table: (.*?)(,.*?)*\}/)[1];
                             const filters = cellContent.match(/filter: (.*?),/);
                             const sort = cellContent.match(/sort: (.*?)\}/);
-                            renderTable(tableParams, filters, sort, contentDiv);
+                            renderTable(tableParams, filters, sort, rowDiv);
                         }
                     } else if (cellContent.trim() !== "") {
                         // Static text
                         const textDiv = document.createElement("div");
                         textDiv.innerText = cellContent;
-                        contentDiv.appendChild(textDiv);
+                        rowDiv.appendChild(textDiv);
                     }
                 });
+
+                contentDiv.appendChild(rowDiv);
             });
         }
 
