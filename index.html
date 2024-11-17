@@ -1,63 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThankYou - A Community-Driven Platform</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Collaborative Housing Projects</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .menu { margin-bottom: 20px; }
+        .menu-item { margin-right: 15px; cursor: pointer; color: blue; text-decoration: underline; }
+        .header-large { font-size: 24px; font-weight: bold; }
+        .footer-small { font-size: 12px; color: gray; }
+        .table-striped tr:nth-child(even) { background-color: #f9f9f9; }
+        table { border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to ThankYou</h1>
-        <p>Your platform for collaborative housing projects and community-driven ideas.</p>
-    </header>
-    <div id="menu-placeholder"></div>
-    <script>
-        fetch('menu.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('menu-placeholder').innerHTML = data;
-            });
-    </script>
-    <div class="container">
-        <section class="intro">
-            <h2>About ThankYou</h2>
-            <p>ThankYou is a community-driven platform where ideas for collaborative housing projects come to life. Whether you’re looking to find like-minded individuals or share your own project, you’re in the right place.</p>
-            <div class="homepage-image" style="text-align: center;">
-                <img src="images/community-art.png" alt="Community-driven collaboration" class="small-image">
-            </div>
-        </section>
-        
-        <div class="sections">
-            <div class="section">
-                <h3>Profiles</h3>
-                <p>Learn about the different types of people who are interested in collaborative housing.</p>
-                <div class="homepage-image" style="text-align: center;">
-                    <img src="images/profiles-art.png" alt="Community-driven collaboration" class="small-image">
-                </div>
-                <a href="profiles.html">Explore Profiles</a>
-            </div>
-            <div class="section">
-                <h3>Project Ideas</h3>
-                <p>Discover innovative collaborative housing projects or submit your own ideas.</p>
-                <div class="homepage-image" style="text-align: center;">
-                    <img src="images/project-ideas-art.png" alt="Community-driven collaboration" class="small-image">
-                </div>
-                <a href="project-ideas.html">View Projects</a>
-            </div>
-            <div class="section">
-                <h3>Resources</h3>
-                <p>Access valuable resources to support your collaborative housing project journey.</p>
-                <div class="homepage-image" style="text-align: center;">
-                    <img src="images/resources-art.png" alt="Community-driven collaboration" class="small-image">
-                </div>
-                <a href="resources.html">Find Resources</a>
-            </div>
-        </div>
-    </div>
+    <div id="menu" class="menu"></div>
+    <div id="content"></div>
 
-    <footer>
-        <p>&copy; 2024 ThankYou. All rights reserved.</p>
-    </footer>
+    <script>
+        const SHEETS_API_URL = "https://sheets.googleapis.com/v4/spreadsheets";
+        const SHEET_ID = "1nIvuosTOZolBb4eoyBb-dZOufKW1-9kgRwB4galSUlM";
+        const API_KEY = "AIzaSyDauOae1oqVgzKL5LLcX7E2H3DqwvSd5PM";
+
+        // Fetch all sheet names to dynamically generate the menu
+        async function fetchSheetNames() {
+            const url = `${SHEETS_API_URL}/${SHEET_ID}?key=${API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.sheets.map(sheet => sheet.properties.title);
+        }
+
+        // Fetch specific sheet content
+        async function fetchSheet(sheetName) {
+            const url = `${SHEETS_API_URL}/${SHEET_ID}/values/${sheetName}?key=${API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.values;
+        }
+
+        // Render the menu
+        async function renderMenu() {
+            const sheetNames = await fetchSheetNames();
+            const menuDiv = document.getElementById("menu");
+
+            sheetNames.filter(name => name.startsWith("w_")).forEach(name => {
+                const menuName = name.replace("w_", "").replace("_", " "); // Clean up name
+                const link = document.createElement("span");
+                link.innerText = menuName;
+                link.className = "menu-item";
+                link.onclick = () => loadPage(name);
+                menuDiv.appendChild(link);
+            });
+        }
+
+        // Load and render a web page
+        async function loadPage(sheetName) {
+            const pageData = await fetchSheet(sheetName);
+            const contentDiv = document.getElementById("content");
+            contentDiv.innerHTML = ""; // Clear previous content
+
+            pageData.forEach(row => {
+                row.forEach(cellContent => {
+                    if (cellContent.startsWith("{")) {
+                        // Handle special keywords
+                        if (cellContent.startsWith("{style:")) {
+                            const styleClass = cellContent.match(/\{style: (.*?)\}/)[1];
+                            const styledDiv = document.createElement("div");
+                            styledDiv.className = styleClass;
+                            styledDiv.innerText = cellContent.replace(/\{style:.*?\}/, "").trim(); // Remove {style:}
+                            contentDiv.appendChild(styledDiv);
+                        } else if (cellContent.startsWith("{table:")) {
+                            const tableParams = cellContent.match(/\{table: (.*?)(,.*?)*\}/)[1];
+                            const filters = cellContent.match(/filter: (.*?),/);
+                            const sort = cellContent.match(/sort: (.*?)\}/);
+                            renderTable(tableParams, filters, sort, contentDiv);
+                        }
+                    } else if (cellContent.trim() !== "") {
+                        // Static text
+                        const textDiv = document.createElement("div");
+                        textDiv.innerText = cellContent;
+                        contentDiv.appendChild(textDiv);
+                    }
+                });
+            });
+        }
+
+        // Render a table
+        async function renderTable(tableName, filters, sort, container) {
+            const tableData = await fetchSheet(tableName);
+
+            const table = document.createElement("table");
+            table.className = "table-striped";
+            const headers = tableData[0];
+            let rows = tableData.slice(1);
+
+            // Apply filters
+            if (filters) {
+                const [filterColumn, filterValue] = filters[1].split("=");
+                rows = rows.filter(row => row[headers.indexOf(filterColumn.trim())] === filterValue.trim());
+            }
+
+            // Apply sorting
+            if (sort) {
+                const [sortColumn, sortDirection] = sort[1].split(" ");
+                const colIndex = headers.indexOf(sortColumn.trim());
+                rows.sort((a, b) => {
+                    if (sortDirection === "ASC") return a[colIndex] > b[colIndex] ? 1 : -1;
+                    else return a[colIndex] < b[colIndex] ? 1 : -1;
+                });
+            }
+
+            // Create table header
+            const thead = document.createElement("thead");
+            const headerRow = document.createElement("tr");
+            headers.forEach(header => {
+                const th = document.createElement("th");
+                th.innerText = header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // Create table body
+            const tbody = document.createElement("tbody");
+            rows.forEach(row => {
+                const tr = document.createElement("tr");
+                row.forEach(cell => {
+                    const td = document.createElement("td");
+                    td.innerText = cell;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+
+            container.appendChild(table);
+        }
+
+        // Initialize
+        renderMenu();
+        loadPage("w_home"); // Default to home page
+    </script>
 </body>
 </html>
