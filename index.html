@@ -33,21 +33,20 @@
           return response.text();
         })
         .then(scriptContent => {
-          logStep("Step 3: Embedding main script into the page...");
+          logStep("Step 3: Embedding and evaluating main script...");
           const scriptWithUrl = `const GAS_WEB_APP_URL = "${GAS_WEB_APP_URL}";\n` + scriptContent;
 
-          // Inject the script into the page
-          const scriptElement = document.createElement("script");
-          scriptElement.text = scriptWithUrl;
-          document.head.appendChild(scriptElement);
+          // Explicitly evaluate the script in the global scope
+          const script = document.createElement("script");
+          script.text = scriptWithUrl;
+          document.head.appendChild(script);
 
-          logStep("Step 4: Main script embedded successfully. Attempting to initialize app...");
-
-          // Explicitly call `initializeApp` if defined in `c_javascript`
+          // Double-check if initializeApp() is defined
           if (typeof initializeApp === "function") {
+            logStep("initializeApp function found. Calling initializeApp...");
             initializeApp();
           } else {
-            logError("initializeApp function is not defined or not loaded.");
+            throw new Error("initializeApp function is not defined after script execution.");
           }
         })
         .catch(error => {
