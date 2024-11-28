@@ -1,47 +1,120 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>LittleHomes</title>
-<script>
-// Replace with your actual GAS web app URL
-const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxMrDvLGO3QsDQI3pk4K5a9U8jihJ1Qp3WWIcX3PXJkfWLytr9IvgNk9t6eF80YhoLI/exec';
+  <title>Dynamic Web App</title>
+  <script>
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
 
-// Function to load and execute the main JavaScript from GAS
-function loadMainScript() {
-console.log("Attempting to load main script from GAS...");
-fetch(`${GAS_WEB_APP_URL}?action=getScript`)
-.then(response => {
-if (!response.ok) {
-console.error("Network response not ok:", response.status, response.statusText);
-throw new Error(`Failed to fetch script: ${response.statusText}`);
-}
-return response.text();
-})
-.then(scriptContent => {
-console.log("Script successfully fetched. Adding to the document...");
-const scriptElement = document.createElement('script');
-scriptElement.text = scriptContent;
-document.head.appendChild(scriptElement);
-console.log("Script added to the document successfully.");
-})
-.catch(error => {
-console.error("Error loading main script:", error.message);
-document.body.innerHTML = `
-<p>Error loading page. Please try again later.</p>
-<p><strong>Debug Info:</strong> ${error.message}</p>
-`;
-});
-}
+    // Step 1: Fetch main JavaScript from GAS
+    function loadMainScript() {
+      logStep("Step 1: Loading main JavaScript from GAS...");
+      fetch(`${GAS_WEB_APP_URL}?action=getScript`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch main script.");
+          }
+          return response.text();
+        })
+        .then(scriptContent => {
+          logStep("Step 1: Main script loaded successfully.");
+          executeMainScript(scriptContent);
+        })
+        .catch(error => {
+          logError("Error in Step 1: " + error.message);
+        });
+    }
 
-// Load the main script once the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-console.log("DOM fully loaded. Starting script loading...");
-loadMainScript();
-});
-</script>
+    // Step 2: Execute the fetched script
+    function executeMainScript(scriptContent) {
+      logStep("Step 2: Executing main JavaScript...");
+      try {
+        const scriptElement = document.createElement("script");
+        scriptElement.text = scriptContent;
+        document.head.appendChild(scriptElement);
+        logStep("Step 2: Main script executed successfully.");
+        initializeApp(); // Assume the main script defines an initializeApp function
+      } catch (error) {
+        logError("Error in Step 2: " + error.message);
+      }
+    }
+
+    // Step 3: Initialize app (menu and content)
+    function initializeApp() {
+      logStep("Step 3: Initializing app...");
+      fetch(`${GAS_WEB_APP_URL}?action=getMenu`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch menu.");
+          }
+          return response.json();
+        })
+        .then(menuItems => {
+          logStep("Step 3: Menu fetched successfully.");
+          renderMenu(menuItems);
+        })
+        .catch(error => {
+          logError("Error in Step 3: " + error.message);
+        });
+    }
+
+    // Render menu from fetched sheet names
+    function renderMenu(menuItems) {
+      logStep("Step 4: Rendering menu...");
+      const menuContainer = document.getElementById("menu");
+      menuItems.forEach(item => {
+        const menuItem = document.createElement("button");
+        menuItem.textContent = item;
+        menuItem.addEventListener("click", () => loadContent(item));
+        menuContainer.appendChild(menuItem);
+      });
+      logStep("Step 4: Menu rendered successfully.");
+    }
+
+    // Load and display content of the selected sheet
+    function loadContent(sheetName) {
+      logStep(`Step 5: Loading content for sheet "${sheetName}"...`);
+      fetch(`${GAS_WEB_APP_URL}?action=getPage&sheetName=${encodeURIComponent(sheetName)}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Failed to load content for sheet "${sheetName}".`);
+          }
+          return response.text();
+        })
+        .then(content => {
+          logStep(`Step 5: Content for "${sheetName}" loaded successfully.`);
+          document.getElementById("content").innerHTML = content;
+        })
+        .catch(error => {
+          logError(`Error in Step 5: ${error.message}`);
+        });
+    }
+
+    // Log progress and errors
+    function logStep(message) {
+      console.log(message);
+      const logContainer = document.getElementById("log");
+      const logEntry = document.createElement("p");
+      logEntry.textContent = message;
+      logContainer.appendChild(logEntry);
+    }
+
+    function logError(message) {
+      console.error(message);
+      const logContainer = document.getElementById("log");
+      const logEntry = document.createElement("p");
+      logEntry.style.color = "red";
+      logEntry.textContent = message;
+      logContainer.appendChild(logEntry);
+    }
+
+    // Start the process
+    document.addEventListener("DOMContentLoaded", loadMainScript);
+  </script>
 </head>
 <body>
-<!-- Content will be dynamically generated -->
-<p>Loading content, please wait...</p>
+  <h1>Dynamic Web App</h1>
+  <div id="log">Logs:</div>
+  <div id="menu">Menu:</div>
+  <div id="content">Content will appear here...</div>
 </body>
 </html>
