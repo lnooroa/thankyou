@@ -29,26 +29,24 @@
           if (!response.ok) {
             throw new Error(`Failed to fetch main script. Status: ${response.status}`);
           }
-          logStep("Step 2: Main script fetched successfully.");
           return response.text();
         })
         .then(scriptContent => {
-          logStep("Step 3: Evaluating main script in global scope...");
+          logStep("Step 2: Main script fetched successfully.");
+          console.log("Fetched script content:", scriptContent); // Log the fetched script
           const scriptWithUrl = `const GAS_WEB_APP_URL = "${GAS_WEB_APP_URL}";\n` + scriptContent;
-
-          // Evaluate the script in the global scope
+    
           try {
             eval(scriptWithUrl);
-            logStep("Step 4: Main script evaluated successfully. Attempting to initialize app...");
-
-            // Check if `initializeApp` is defined
+            logStep("Step 3: Main script evaluated successfully. Attempting to initialize app...");
+    
             if (typeof initializeApp === "function") {
               initializeApp();
             } else {
               throw new Error("initializeApp function is not defined after script evaluation.");
             }
           } catch (error) {
-            throw new Error(`Error evaluating script: ${error.message}`);
+            logError(`Error evaluating script: ${error.message}`);
           }
         })
         .catch(error => {
