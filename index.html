@@ -5,33 +5,67 @@
   <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxMrDvLGO3QsDQI3pk4K5a9U8jihJ1Qp3WWIcX3PXJkfWLytr9IvgNk9t6eF80YhoLI/exec";
 
+    // Function to log debug messages
+    function logStep(message) {
+      console.log(message);
+      const logContainer = document.getElementById("debug-log");
+      const logEntry = document.createElement("p");
+      logEntry.textContent = message;
+      logContainer.appendChild(logEntry);
+    }
+
+    function logError(message) {
+      console.error(message);
+      const logContainer = document.getElementById("debug-log");
+      const logEntry = document.createElement("p");
+      logEntry.style.color = "red";
+      logEntry.textContent = "ERROR: " + message;
+      logContainer.appendChild(logEntry);
+    }
+
     // Function to load and execute the main JavaScript
     function loadMainScript() {
+      logStep("Step 1: Fetching main script from GAS...");
       fetch(`${GAS_WEB_APP_URL}?action=getScript`)
         .then(response => {
           if (!response.ok) {
             throw new Error(`Failed to fetch main script. Status: ${response.status}`);
           }
+          logStep("Step 2: Main script fetched successfully.");
           return response.text();
         })
         .then(scriptContent => {
+          logStep("Step 3: Embedding main script into the page...");
           const scriptWithUrl = `const GAS_WEB_APP_URL = "${GAS_WEB_APP_URL}";\n` + scriptContent;
+
+          // Log the fetched script (for debugging purposes)
+          logStep("Fetched script content:\n" + scriptContent);
+
+          // Inject the fetched script
           const scriptElement = document.createElement("script");
           scriptElement.text = scriptWithUrl;
           document.head.appendChild(scriptElement);
+
+          logStep("Step 4: Main script executed successfully.");
         })
         .catch(error => {
-          document.body.innerHTML += `<p>Error loading the application: ${error.message}</p>`;
+          logError(`Error during main script loading: ${error.message}`);
         });
     }
 
     // Start the process when the DOM is fully loaded
-    document.addEventListener("DOMContentLoaded", loadMainScript);
+    document.addEventListener("DOMContentLoaded", () => {
+      logStep("Initializing application...");
+      loadMainScript();
+    });
   </script>
 </head>
 <body>
   <h1>Dynamic Web App</h1>
   <div id="menu"></div>
   <div id="content">Content will appear here...</div>
+  <div id="debug-log" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; background: #f9f9f9;">
+    <strong>Debug Log:</strong>
+  </div>
 </body>
 </html>
