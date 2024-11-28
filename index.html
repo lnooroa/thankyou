@@ -3,7 +3,6 @@
 <head>
   <title>Dynamic Web App</title>
   <script>
-    // Replace this URL with your GAS Web App URL
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxMrDvLGO3QsDQI3pk4K5a9U8jihJ1Qp3WWIcX3PXJkfWLytr9IvgNk9t6eF80YhoLI/exec";
 
     // Function to load and execute the main JavaScript
@@ -16,8 +15,12 @@
           return response.text();
         })
         .then(scriptContent => {
+          // Embed the GAS Web App URL into the fetched script
+          const scriptWithUrl = `const GAS_WEB_APP_URL = "${GAS_WEB_APP_URL}";\n` + scriptContent;
+
+          // Execute the modified script
           const scriptElement = document.createElement("script");
-          scriptElement.text = scriptContent;
+          scriptElement.text = scriptWithUrl;
           document.head.appendChild(scriptElement);
         })
         .catch(error => {
