@@ -33,20 +33,22 @@
           return response.text();
         })
         .then(scriptContent => {
-          logStep("Step 3: Embedding and evaluating main script...");
+          logStep("Step 3: Evaluating main script in global scope...");
           const scriptWithUrl = `const GAS_WEB_APP_URL = "${GAS_WEB_APP_URL}";\n` + scriptContent;
 
-          // Explicitly evaluate the script in the global scope
-          const script = document.createElement("script");
-          script.text = scriptWithUrl;
-          document.head.appendChild(script);
+          // Evaluate the script in the global scope
+          try {
+            eval(scriptWithUrl);
+            logStep("Step 4: Main script evaluated successfully. Attempting to initialize app...");
 
-          // Double-check if initializeApp() is defined
-          if (typeof initializeApp === "function") {
-            logStep("initializeApp function found. Calling initializeApp...");
-            initializeApp();
-          } else {
-            throw new Error("initializeApp function is not defined after script execution.");
+            // Check if `initializeApp` is defined
+            if (typeof initializeApp === "function") {
+              initializeApp();
+            } else {
+              throw new Error("initializeApp function is not defined after script evaluation.");
+            }
+          } catch (error) {
+            throw new Error(`Error evaluating script: ${error.message}`);
           }
         })
         .catch(error => {
