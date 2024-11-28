@@ -5,7 +5,6 @@
   <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxMrDvLGO3QsDQI3pk4K5a9U8jihJ1Qp3WWIcX3PXJkfWLytr9IvgNk9t6eF80YhoLI/exec";
 
-    // Function to log debug messages
     function logStep(message) {
       console.log(message);
       const logContainer = document.getElementById("debug-log");
@@ -23,7 +22,6 @@
       logContainer.appendChild(logEntry);
     }
 
-    // Function to load and execute the main JavaScript
     function loadMainScript() {
       logStep("Step 1: Fetching main script from GAS...");
       fetch(`${GAS_WEB_APP_URL}?action=getScript`)
@@ -38,22 +36,25 @@
           logStep("Step 3: Embedding main script into the page...");
           const scriptWithUrl = `const GAS_WEB_APP_URL = "${GAS_WEB_APP_URL}";\n` + scriptContent;
 
-          // Log the fetched script (for debugging purposes)
-          logStep("Fetched script content:\n" + scriptContent);
-
-          // Inject the fetched script
+          // Inject the script into the page
           const scriptElement = document.createElement("script");
           scriptElement.text = scriptWithUrl;
           document.head.appendChild(scriptElement);
 
-          logStep("Step 4: Main script executed successfully.");
+          logStep("Step 4: Main script embedded successfully. Attempting to initialize app...");
+
+          // Explicitly call `initializeApp` if defined in `c_javascript`
+          if (typeof initializeApp === "function") {
+            initializeApp();
+          } else {
+            logError("initializeApp function is not defined or not loaded.");
+          }
         })
         .catch(error => {
           logError(`Error during main script loading: ${error.message}`);
         });
     }
 
-    // Start the process when the DOM is fully loaded
     document.addEventListener("DOMContentLoaded", () => {
       logStep("Initializing application...");
       loadMainScript();
