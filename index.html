@@ -1,47 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>LittleHomes</title>
-  <script>
-    // Replace with your actual GAS web app URL
-    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby3PC54oUCP7xIt_haMz3pf7iyg5KYXha5X1akTdlBtCoeIycpg9UkAF2MqOJauw88a/exec';
+<title>LittleHomes</title>
+<script>
+// Replace with your actual GAS web app URL
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby6ouQXAanCSxrMGp_YrKnada0O7EQXpOYkn0dbWOAWZAWahk8kZEAdRoD-gAqTJXTK/exec';
 
-    // Function to load and execute the main JavaScript from GAS
-    function loadMainScript() {
-      console.log("Attempting to load main script from GAS...");
-      fetch(`${GAS_WEB_APP_URL}?action=getScript`)
-        .then(response => {
-          if (!response.ok) {
-            console.error("Network response not ok:", response.status, response.statusText);
-            throw new Error(`Failed to fetch script: ${response.statusText}`);
-          }
-          return response.text();
-        })
-        .then(scriptContent => {
-          console.log("Script successfully fetched. Adding to the document...");
-          const scriptElement = document.createElement('script');
-          scriptElement.text = scriptContent;
-          document.head.appendChild(scriptElement);
-          console.log("Script added to the document successfully.");
-        })
-        .catch(error => {
-          console.error("Error loading main script:", error.message);
-          document.body.innerHTML = `
-            <p>Error loading page. Please try again later.</p>
-            <p><strong>Debug Info:</strong> ${error.message}</p>
-          `;
-        });
-    }
+// Function to load and execute the main JavaScript from GAS
+function loadMainScript() {
+console.log("Attempting to load main script from GAS...");
+fetch(`${GAS_WEB_APP_URL}?action=getScript`)
+.then(response => {
+if (!response.ok) {
+console.error("Network response not ok:", response.status, response.statusText);
+throw new Error(`Failed to fetch script: ${response.statusText}`);
+}
+return response.text();
+})
+.then(scriptContent => {
+console.log("Script successfully fetched. Adding to the document...");
+const scriptElement = document.createElement('script');
+scriptElement.text = scriptContent;
+document.head.appendChild(scriptElement);
+console.log("Script added to the document successfully.");
+})
+.catch(error => {
+console.error("Error loading main script:", error.message);
+document.body.innerHTML = `
+<p>Error loading page. Please try again later.</p>
+<p><strong>Debug Info:</strong> ${error.message}</p>
+`;
+});
+}
 
-    // Load the main script once the DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log("DOM fully loaded. Starting script loading...");
-      loadMainScript();
-    });
-  </script>
+// Load the main script once the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+console.log("DOM fully loaded. Starting script loading...");
+loadMainScript();
+});
+</script>
 </head>
 <body>
-  <!-- Content will be dynamically generated -->
-  <p>Loading content, please wait...</p>
+<!-- Content will be dynamically generated -->
+<p>Loading content, please wait...</p>
 </body>
 </html>
