@@ -1,7 +1,35 @@
 <!DOCTYPE html>
 <html>
-<head><title>LittleHomes</title></head>
+<head>
+<title>LittleHomes</title>
+<script>
+// Replace with your actual GAS web app URL
+const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby3PC54oUCP7xIt_haMz3pf7iyg5KYXha5X1akTdlBtCoeIycpg9UkAF2MqOJauw88a/exec';
+
+// Function to load and execute the main JavaScript from GAS
+function loadMainScript() {
+fetch(`${GAS_WEB_APP_URL}?action=getScript`)
+.then(response => {
+if (!response.ok) throw new Error('Network response was not ok');
+return response.text();
+})
+.then(scriptContent => {
+// Create a new script element and append it to the document
+const scriptElement = document.createElement('script');
+scriptElement.text = scriptContent;
+document.head.appendChild(scriptElement);
+})
+.catch(error => {
+console.error('Error loading main script:', error);
+document.body.innerHTML = '<p>Error loading page. Please try again later.</p>';
+});
+}
+
+// Load the main script once the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', loadMainScript);
+</script>
+</head>
 <body>
-<script src='c_javascript.js'></script>
+<!-- Content will be dynamically generated -->
 </body>
 </html>
