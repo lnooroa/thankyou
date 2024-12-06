@@ -7,20 +7,11 @@
     let appInitialized = false; // Global guard to prevent double initialization
 
     function logStep(message) {
-      console.log(message);
-      const logContainer = document.getElementById("debug-log");
-      const logEntry = document.createElement("p");
-      logEntry.textContent = message;
-      logContainer.appendChild(logEntry);
+      console.log(message); // Log messages to the console
     }
 
     function logError(message) {
-      console.error(message);
-      const logContainer = document.getElementById("debug-log");
-      const logEntry = document.createElement("p");
-      logEntry.style.color = "red";
-      logEntry.textContent = "ERROR: " + message;
-      logContainer.appendChild(logEntry);
+      console.error(message); // Log errors to the console
     }
 
     function loadMainScript() {
@@ -67,8 +58,5 @@
   <h1>Dynamic Web App</h1>
   <div id="menu"></div>
   <div id="content">Content will appear here...</div>
-  <div id="debug-log" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; background: #f9f9f9;">
-    <strong>Debug Log:</strong>
-  </div>
 </body>
 </html>
