@@ -4,6 +4,7 @@
   <title>Dynamic Web App</title>
   <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxMrDvLGO3QsDQI3pk4K5a9U8jihJ1Qp3WWIcX3PXJkfWLytr9IvgNk9t6eF80YhoLI/exec";
+    let appInitialized = false; // Global guard to prevent double initialization
 
     function logStep(message) {
       console.log(message);
@@ -35,13 +36,15 @@
           logStep("Step 2: Main script fetched successfully.");
           console.log("Fetched script content:", scriptContent); // Log the fetched script
           const scriptWithUrl = `const GAS_WEB_APP_URL = "${GAS_WEB_APP_URL}";\n` + scriptContent;
-    
+
           try {
             eval(scriptWithUrl);
             logStep("Step 3: Main script evaluated successfully. Attempting to initialize app...");
-    
-            if (typeof initializeApp === "function") {
+
+            if (typeof initializeApp === "function" && !appInitialized) {
               initializeApp();
+            } else if (appInitialized) {
+              logStep("Skipping initialization as the app is already initialized.");
             } else {
               throw new Error("initializeApp function is not defined after script evaluation.");
             }
@@ -55,7 +58,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      logStep("Initializing application...");
+      logStep("Attempting to load main script...");
       loadMainScript();
     });
   </script>
