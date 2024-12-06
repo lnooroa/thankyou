@@ -2,54 +2,67 @@
 <html>
 <head>
   <title>Dynamic Web App</title>
+  <style>
+    #content {
+      font-size: 16px;
+      color: #666;
+      text-align: center;
+      padding: 20px;
+    }
+    #loading {
+      font-size: 18px;
+      color: #333;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
   <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxMrDvLGO3QsDQI3pk4K5a9U8jihJ1Qp3WWIcX3PXJkfWLytr9IvgNk9t6eF80YhoLI/exec";
-    let appInitialized = false; // Global guard to prevent double initialization
+    let appInitialized = false;
 
     function logStep(message) {
-      console.log(message); // Log messages to the console
+      console.log(message);
     }
 
     function logError(message) {
-      console.error(message); // Log errors to the console
+      console.error(message);
     }
 
     function loadMainScript() {
-      logStep("Step 1: Fetching main script from GAS...");
+      logStep("Fetching main script from GAS...");
       fetch(`${GAS_WEB_APP_URL}?action=getScript`)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) {
             throw new Error(`Failed to fetch main script. Status: ${response.status}`);
           }
           return response.text();
         })
-        .then(scriptContent => {
-          logStep("Step 2: Main script fetched successfully.");
-          console.log("Fetched script content:", scriptContent); // Log the fetched script
+        .then((scriptContent) => {
+          logStep("Main script fetched successfully.");
           const scriptWithUrl = `const GAS_WEB_APP_URL = "${GAS_WEB_APP_URL}";\n` + scriptContent;
 
           try {
             eval(scriptWithUrl);
-            logStep("Step 3: Main script evaluated successfully. Attempting to initialize app...");
-
+            logStep("Main script evaluated successfully. Initializing app...");
             if (typeof initializeApp === "function" && !appInitialized) {
               initializeApp();
             } else if (appInitialized) {
               logStep("Skipping initialization as the app is already initialized.");
             } else {
-              throw new Error("initializeApp function is not defined after script evaluation.");
+              throw new Error("initializeApp function is not defined.");
             }
           } catch (error) {
             logError(`Error evaluating script: ${error.message}`);
           }
         })
-        .catch(error => {
+        .catch((error) => {
           logError(`Error during main script loading: ${error.message}`);
         });
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      logStep("Attempting to load main script...");
+      const contentDiv = document.getElementById("content");
+      contentDiv.innerHTML = `<div id="loading">Loading content, please wait...</div>`;
       loadMainScript();
     });
   </script>
@@ -57,6 +70,6 @@
 <body>
   <h1>Dynamic Web App</h1>
   <div id="menu"></div>
-  <div id="content">Content will appear here...</div>
+  <div id="content"></div>
 </body>
 </html>
